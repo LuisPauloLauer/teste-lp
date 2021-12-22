@@ -1,0 +1,3 @@
+# index:
+#    path: /dohash
+#    controller: App\Controller\hashingController::generateHash
