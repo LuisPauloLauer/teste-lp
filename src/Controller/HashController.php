@@ -28,6 +28,30 @@ class HashController extends AbstractController
     }
 
     /**
+     * @param $request
+     */
+    public function startSesion(Request $request)
+    {
+        session_start();
+        if (!isset($_SESSION['userSession'])) {
+            $_SESSION['userSession'] =  array(
+                'ip' => $request->getClientIp(),
+                'nBloco' => 1,
+                'nAttempts' => 1
+            );
+        } else {
+            $_SESSION['userSession']['nBloco'] ++;
+            $_SESSION['userSession']['nAttempts'] ++;
+        }
+    }
+
+    public function destroySession()
+    {
+        session_start();
+        unset($_SESSION['userSession']);
+    }
+
+    /**
      * @Route("/", name="app_home")
      */
     public function index(): Response
@@ -44,21 +68,13 @@ class HashController extends AbstractController
      */
     public function generateHash(Request $request, RateLimiterFactory $anonymousApiLimiter): Response
     {
+        $this->startSesion($request);
         $limiter = $anonymousApiLimiter->create($request->getClientIp());
-        $hashes = $this->getDoctrine()->getRepository(Hashes::class)->findAll();
-
-        if(count($hashes) == 0){
-            $nBloco = 1;
-            //dd('teste1');
-        } else {
-            //dd('teste2');
-            $nBloco = $hashes[count($hashes)-1]->getNAttempts() + 1;
-            //dd($nBloco);
-        }
 
         // the argument of consume() is the number of tokens to consume
         // and returns an object of type Limit
         if (false === $limiter->consume(1)->isAccepted()) {
+            $_SESSION['userSession']['nBloco'] = 0;
             throw new TooManyRequestsHttpException();
         } else {
             $data = $request->request->all();
@@ -67,15 +83,15 @@ class HashController extends AbstractController
 
             $oHash = new Hashes();
             $oHash->setBatch(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
-            $oHash->setNBloco(1);
+            $oHash->setNBloco($_SESSION['userSession']['nBloco']);
             $oHash->setInputString($textHash);
             $oHash->setKey($dataHash['key']);
             $oHash->setHash($dataHash['hash']);
-            $oHash->setNAttempts($nBloco);
+            $oHash->setNAttempts($_SESSION['userSession']['nAttempts']);
 
             $doctrine = $this->getDoctrine()->getManager();
             $doctrine->persist($oHash);
-            dd($doctrine->flush());
+            $doctrine->flush();
 
             $hashes = $this->getDoctrine()->getRepository(Hashes::class)->findAll();
 
@@ -90,22 +106,13 @@ class HashController extends AbstractController
      */
     public function generatehashByapi($text, Request $request, RateLimiterFactory $anonymousApiLimiter): Response
     {
+        $this->startSesion($request);
         $limiter = $anonymousApiLimiter->create($request->getClientIp());
-        $hashes = $this->getDoctrine()->getRepository(Hashes::class)->findAll();
-
-        if(count($hashes) == 0){
-            $nBloco = 1;
-            //dd('teste1');
-        } else {
-            //dd('teste2');
-            $nBloco = $hashes[count($hashes)-1]->getNAttempts() + 1;
-            //dd($nBloco);
-        }
 
         // the argument of consume() is the number of tokens to consume
         // and returns an object of type Limit
         if (false === $limiter->consume(1)->isAccepted()) {
-            //throw new TooManyRequestsHttpException();
+            $_SESSION['userSession']['nBloco'] = 0;
             return $this->json(['error' => 'Too ManyAttempts'], 429);
         } else {
             $textHash = $text;
@@ -113,11 +120,11 @@ class HashController extends AbstractController
 
             $oHash = new Hashes();
             $oHash->setBatch(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
-            $oHash->setNBloco(1);
+            $oHash->setNBloco($_SESSION['userSession']['nBloco']);
             $oHash->setInputString($textHash);
             $oHash->setKey($dataHash['key']);
             $oHash->setHash($dataHash['hash']);
-            $oHash->setNAttempts($nBloco);
+            $oHash->setNAttempts($_SESSION['userSession']['nAttempts']);
 
             $doctrine = $this->getDoctrine()->getManager();
             $doctrine->persist($oHash);
