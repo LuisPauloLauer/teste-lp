@@ -20,7 +20,7 @@ final class Version20211221203620 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE hashes (id INT AUTO_INCREMENT NOT NULL, batch DATETIME NOT NULL, n_bloco INT NOT NULL, input_string VARCHAR(255) NOT NULL, `key` VARCHAR(8) NOT NULL, hash VARCHAR(255) NOT NULL, n_attempts INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_general_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE hashes (id INT AUTO_INCREMENT NOT NULL, dbatch DATETIME NOT NULL, n_bloco INT NOT NULL, input_string VARCHAR(255) NOT NULL, skey VARCHAR(8) NOT NULL, shash VARCHAR(255) NOT NULL, n_attempts INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_general_ci` ENGINE = InnoDB');
     }
 
     public function down(Schema $schema): void

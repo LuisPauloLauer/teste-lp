@@ -20,7 +20,7 @@ class Hashes
     /**
      * @ORM\Column(type="datetime")
      */
-    private $batch;
+    private $dbatch;
 
     /**
      * @ORM\Column(type="integer")
@@ -35,12 +35,12 @@ class Hashes
     /**
      * @ORM\Column(type="string", length=8)
      */
-    private $key;
+    private $skey;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $hash;
+    private $shash;
 
     /**
      * @ORM\Column(type="integer")
@@ -54,12 +54,12 @@ class Hashes
 
     public function getBatch(): ?\DateTimeInterface
     {
-        return $this->batch;
+        return $this->dbatch;
     }
 
-    public function setBatch(\DateTimeInterface $batch): self
+    public function setBatch(\DateTimeInterface $dbatch): self
     {
-        $this->batch = $batch;
+        $this->dbatch = $dbatch;
 
         return $this;
     }
@@ -90,24 +90,24 @@ class Hashes
 
     public function getKey(): ?string
     {
-        return $this->key;
+        return $this->skey;
     }
 
-    public function setKey(string $key): self
+    public function setKey(string $skey): self
     {
-        $this->key = $key;
+        $this->skey = $skey;
 
         return $this;
     }
 
     public function getHash(): ?string
     {
-        return $this->hash;
+        return $this->shash;
     }
 
-    public function setHash(string $hash): self
+    public function setHash(string $shash): self
     {
-        $this->hash = $hash;
+        $this->shash = $shash;
 
         return $this;
     }
